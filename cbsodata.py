@@ -150,14 +150,12 @@ def _download_metadata(table_id, metadata_name, select=None, filters=None,
 
             try:
                 r = s.send(p)
-                logging.info("Download " + p.url)
             except requests.exceptions.SSLError:
                 # als je van binnen het cbs download met je het http protocol gebruiken
                 url = url.replace("https", "http")
-                logging.info("Download " + p.url)
                 p = Request('GET', url, params=params).prepare()
                 r = s.send(p)
-
+            logging.info("Download " + p.url)
             r.raise_for_status()
 
             res = r.json(encoding='utf-8')
