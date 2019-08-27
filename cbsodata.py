@@ -35,7 +35,7 @@ from contextlib import contextmanager
 import requests
 from requests import Session, Request
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 
 CBSOPENDATA = "opendata.cbs.nl"  # deprecate in next version
