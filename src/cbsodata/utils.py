@@ -1,9 +1,11 @@
 """
 Een aantal losstaande functies en klasses voor betere verwerking van de OpenData
 
-* StatTLineTable: klasse om de data gelezen door cbsodata te reorganiseren om het meer toegankelijk te maken
+* StatTLineTable: klasse om de data gelezen door cbsodata te reorganiseren om het meer toegankelijk
+  te maken
 * DataProperties: help klasse, alleen gebruikt door StatLineTable
 """
+
 import collections
 import json
 import logging
