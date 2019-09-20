@@ -81,8 +81,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'cbsodata'
-copyright = u'2019, Eelco van Vliet'
+project = u'CBSOData'
+copyright = u'2016, Jonathan de Bruin'
+author = u'Jonathan de Bruin'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -105,7 +106,8 @@ release = ''  # Is set by calling `setup.py docs`
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+# This patterns also effect to html_static_path and html_extra_path
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -135,7 +137,8 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+#
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -216,7 +219,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'cbsodata-doc'
+htmlhelp_basename = 'CBSODatadoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -235,8 +238,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'user_guide.tex', u'cbsodata Documentation',
-   u'Eelco van Vliet', 'manual'),
+    (master_doc, 'CBSOData.tex', u'CBSOData Documentation',
+     u'Jonathan de Bruin', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
