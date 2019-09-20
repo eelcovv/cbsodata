@@ -1,50 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+    Setup file for cbsodata.
+    Use setup.cfg to configure your project.
+
+    This file was generated with PyScaffold 3.1.
+    PyScaffold helps you to put up the scaffold of your new Python project.
+    Learn more under: https://pyscaffold.org/
+"""
+import sys
+
+from pkg_resources import require, VersionConflict
 from setuptools import setup
 
-from os import path
-from codecs import open
+try:
+    require('setuptools>=38.3')
+except VersionConflict:
+    print("Error: version of setuptools is too old (<38.3)!")
+    sys.exit(1)
 
-here = path.abspath(path.dirname(__file__))
 
-# Use readme as long description
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
-
-# Extract version from cbsodata.py
-for line in open(path.join('cbsodata', '__init__.py')):
-    if line.startswith('__version__'):
-        exec(line)
-        break
-
-setup(
-    name='cbsodata',
-    version=__version__,  # noqa
-    description='Statistics Netherlands opendata API client for Python',
-    long_description=long_description,
-    url='https://github.com/J535D165/cbsodata',
-    author='Jonathan de Bruin',
-    author_email='jonathandebruinos@gmail.com',
-    license='MIT',
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
-    ],
-    keywords='cbs statistics odata netherlands dutch',
-    install_requires=['requests'],
-    entry_points={
-        # two entry points: cbs and cbsodata
-        'console_scripts': [
-            'cbsodata=cbsodata.__main__:main',
-            'cbs=cbsodata.__main__:main',
-        ],
-
-    },
-    py_modules=['cbsodata.cbsodata3', 'cbsodata.__main__'],
-    tests_require=[
-        'pytest'
-    ],
-)
+if __name__ == "__main__":
+    setup(use_pyscaffold=True)

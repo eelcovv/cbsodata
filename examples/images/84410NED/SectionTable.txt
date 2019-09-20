@@ -1,0 +1,35 @@
++------+------------+----------------------------------------+
+|   ID |   ParentID | Title                                  |
+|------+------------+----------------------------------------|
+|    1 |            | Personeel en ICT                       |
+|    4 |          1 | ICT-specialisten                       |
+|    9 |          1 | ICT-beveiliging/bescherming data       |
+|   13 |            | Toegang en gebruik internet            |
+|   14 |         13 | Bedrijven met website                  |
+|   16 |         14 | Website bevat                          |
+|   23 |            | Cloud-diensten                         |
+|   25 |         23 | Type cloud-diensten                    |
+|   33 |         25 | Type server                            |
+|   36 |            | Big-data-analyse                       |
+|   38 |         36 | Bronnen big data voor analyse          |
+|   43 |         36 | Wie analyseerde big data               |
+|   46 |            | ICT-veiligheid                         |
+|   47 |         46 | Gebruikte ICT-veiligheidsmaatregelen   |
+|   60 |         46 | Optreden van ICT veiligheidsincidenten |
+|   65 |         46 | Oorzaken van ICT veiligheidsincidenten |
+|   72 |         46 | Kosten ICT-veiligheidsincidenten       |
+|   79 |         46 | Uitvoeren updates (security patching)  |
+|   83 |            | Facturen                               |
+|   84 |         83 | Facturen verzonden aan                 |
+|   88 |         83 | Wijze van verzending van facturen      |
+|   92 |         83 | Wijze van ontvangst van facturen       |
+|   97 |            | E-commerce in 2017                     |
+|   98 |         97 | Gebruik voor verkoop                   |
+|  100 |         98 | Verdeling omzet: eigen site of extern  |
+|  110 |         98 | Via een website/app                    |
+|  119 |        110 | Naar afnemer                           |
+|  124 |         98 | Via EDI                                |
+|  133 |         97 | Gebruik voor inkoop                    |
+|  142 |        133 | Via een website/app                    |
+|  151 |        133 | Via EDI                                |
++------+------------+----------------------------------------+
