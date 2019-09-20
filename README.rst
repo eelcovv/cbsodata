@@ -136,15 +136,97 @@ There are multiple ways to retrieve data from catalogs other than
 'opendata.cbs.nl'. The code below shows 3 different ways to retrieve data from
 the catalog 'dataderden.cbs.nl' (known from Iv3).
 
+On module level.
 
-Description
-===========
+.. code:: python
 
-A longer description of your project goes here...
+   cbsodata.options.catalog_url = 'dataderden.cbs.nl'
+   # list tables
+   cbsodata.get_table_list()
+   # get dataset 47003NED
+   cbsodata.get_data('47003NED')
+
+With context managers.
+
+.. code:: python
+
+   with cbsodata.catalog('dataderden.cbs.nl'):
+       # list tables
+       cbsodata.get_table_list()
+       # get dataset 47003NED
+       cbsodata.get_data('47003NED')
+
+As a function argument.
+
+.. code:: python
+
+   # list tables
+   cbsodata.get_table_list(catalog_url='dataderden.cbs.nl')
+   # get dataset 47003NED
+   cbsodata.get_data('47003NED', catalog_url='dataderden.cbs.nl')
+
+Pandas users
+~~~~~~~~~~~~
+
+The package works well with Pandas. Convert the result easily into a pandas
+DataFrame with the code below.
+
+.. code:: python
+
+    >>> data = pandas.DataFrame(cbsodata.get_data('82070ENG'))
+    >>> data.head()
+
+The list of tables can be turned into a pandas DataFrame as well.
+
+.. code:: python
+
+    >>> tables = pandas.DataFrame(cbsodata.get_table_list())
+    >>> tables.head()
 
 
-Note
-====
+Command Line Interface
+----------------------
 
-This project has been set up using PyScaffold 3.1. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+This library ships with a Command Line Interface (CLI).
+
+.. code:: bash
+
+    > cbsodata -h
+    usage: cbsodata [-h] [--version] [subcommand]
+
+    CBS Open Data: Command Line Interface
+
+    positional arguments:
+      subcommand  the subcommand (one of 'data', 'info', 'list')
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      --version   show the package version
+
+Download data:
+
+.. code:: bash
+
+    > cbsodata data 82010NED
+
+Retrieve table information:
+
+.. code:: bash
+
+    > cbsodata info 82010NED
+
+Retrieve a list with all tables:
+
+.. code:: bash
+
+    > cbsodata list
+
+
+Export data
+~~~~~~~~~~~
+
+Use the flag ``-o`` to load data to a file (JSON lines).
+
+.. code:: bash
+
+    > cbsodata data 82010NED -o table_82010NED.jl
