@@ -27,7 +27,7 @@ import argparse
 import json
 import sys
 
-import cbsodata
+from cbsodata.cbsodata3 import (get_data, get_table_list, get_info)
 
 AVAILABLE_CMDS = ["data", "info", "list"]
 
@@ -161,7 +161,7 @@ def main():
         parse_argument_output(parser)
         args = parser.parse_args(sys.argv[2:])
 
-        result = cbsodata.get_data(args.table_id, catalog_url=args.catalog_url)
+        result = get_data(args.table_id, catalog_url=args.catalog_url)
 
         if args.output_file:
             save_list_to_json(result, args.output_file)
@@ -186,7 +186,7 @@ def main():
         parse_argument_output(parser)
         args = parser.parse_args(sys.argv[2:])
 
-        result = cbsodata.get_info(args.table_id, catalog_url=args.catalog_url)
+        result = get_info(args.table_id, catalog_url=args.catalog_url)
 
         if args.output_file:
             with open(args.output_file, 'w') as f:
@@ -214,7 +214,7 @@ def main():
         parse_argument_output(parser)
         args = parser.parse_args(sys.argv[2:])
 
-        result = cbsodata.get_table_list(catalog_url=args.catalog_url)
+        result = get_table_list(catalog_url=args.catalog_url)
 
         if args.output_file:
             save_list_to_json(result, args.output_file)

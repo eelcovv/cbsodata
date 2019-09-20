@@ -3,7 +3,7 @@ import shutil
 
 import requests
 
-import cbsodata3 as cbsodata
+from cbsodata import cbsodata3 as opendata
 
 # testing deps
 import pytest
@@ -41,7 +41,7 @@ def teardown_module(module):
 def test_info(table_id):
 
     # testing
-    info = cbsodata.get_info(table_id)
+    info = opendata.get_info(table_id)
 
     assert isinstance(info, dict)
 
@@ -49,14 +49,14 @@ def test_info(table_id):
 @pytest.mark.parametrize("table_id", datasets)
 def test_download(table_id):
 
-    cbsodata.download_data(table_id)
+    opendata.download_data(table_id)
 
 
 @pytest.mark.parametrize("table_id", ['00000AAA'])
 def test_http_error(table_id):
 
     try:
-        cbsodata.get_data(table_id)
+        opendata.get_data(table_id)
     except requests.HTTPError:
         assert True
     else:
@@ -66,7 +66,7 @@ def test_http_error(table_id):
 def test_http_error_table_list():
 
     try:
-        cbsodata.get_table_list(catalog_url='test.cbs.nl')
+        opendata.get_table_list(catalog_url='test.cbs.nl')
     except requests.ConnectionError:
         assert True
     else:
@@ -76,17 +76,17 @@ def test_http_error_table_list():
 @pytest.mark.parametrize("table_id", datasets)
 def test_http_https_download(table_id):
 
-    cbsodata.options['use_https'] = True
-    cbsodata.download_data(table_id)
-    cbsodata.options['use_https'] = False
-    cbsodata.download_data(table_id)
-    cbsodata.options['use_https'] = True
+    opendata.options['use_https'] = True
+    opendata.download_data(table_id)
+    opendata.options['use_https'] = False
+    opendata.download_data(table_id)
+    opendata.options['use_https'] = True
 
 
 @pytest.mark.parametrize("table_id", datasets)
 def test_download_and_store(table_id):
 
-    cbsodata.download_data(
+    opendata.download_data(
         table_id,
         dir=os.path.join(TEST_ENV, table_id)
     )
@@ -99,13 +99,13 @@ def test_download_and_store(table_id):
 @pytest.mark.parametrize("table_id", datasets)
 def test_get_data(table_id):
 
-    cbsodata.get_data(table_id)
+    opendata.get_data(table_id)
 
 
 @pytest.mark.parametrize("table_id", datasets)
 def test_info_values(table_id):
 
-    info = cbsodata.get_info(table_id)
+    info = opendata.get_info(table_id)
 
     # Check response is dict (not a list)
     assert isinstance(info, dict)
@@ -118,48 +118,48 @@ def test_info_values(table_id):
 
 def test_table_list():
 
-    assert len(cbsodata.get_table_list()) > 100
+    assert len(opendata.get_table_list()) > 100
 
 
 def test_filters():
 
-    default_sel_filt = cbsodata.get_info('82070ENG')['DefaultSelection']
+    default_sel_filt = opendata.get_info('82070ENG')['DefaultSelection']
     filters_and_selections = default_sel_filt.split("&")
 
     for fs in filters_and_selections:
         if fs.startswith('$filter='):
             filt = fs[8:]
 
-    cbsodata.get_data('82070ENG', filters=filt)
+    opendata.get_data('82070ENG', filters=filt)
 
 
 def test_select():
 
-    default_sel_filt = cbsodata.get_info('82070ENG')['DefaultSelection']
+    default_sel_filt = opendata.get_info('82070ENG')['DefaultSelection']
     filters_and_selections = default_sel_filt.split("&")
 
     for fs in filters_and_selections:
         if fs.startswith('$select='):
             select = fs[8:]
 
-    cbsodata.get_data('82070ENG', select=select)
+    opendata.get_data('82070ENG', select=select)
 
 
 def test_select_list():
 
-    default_sel_filt = cbsodata.get_info('82070ENG')['DefaultSelection']
+    default_sel_filt = opendata.get_info('82070ENG')['DefaultSelection']
     filters_and_selections = default_sel_filt.split("&")
 
     for fs in filters_and_selections:
         if fs.startswith('$select='):
             select = fs[8:]
 
-    cbsodata.get_data('82070ENG', select=select.split(', '))
+    opendata.get_data('82070ENG', select=select.split(', '))
 
 
 def test_select_subset():
 
-    default_sel_filt = cbsodata.get_info('82070ENG')['DefaultSelection']
+    default_sel_filt = opendata.get_info('82070ENG')['DefaultSelection']
     filters_and_selections = default_sel_filt.split("&")
 
     for fs in filters_and_selections:
@@ -167,12 +167,12 @@ def test_select_subset():
             select = fs[8:]
 
     select_list = select.split(', ')
-    cbsodata.get_data('82070ENG', select=select_list[0:2])
+    opendata.get_data('82070ENG', select=select_list[0:2])
 
 
 def test_select_n_cols():
 
-    default_sel_filt = cbsodata.get_info('82070ENG')['DefaultSelection']
+    default_sel_filt = opendata.get_info('82070ENG')['DefaultSelection']
     filters_and_selections = default_sel_filt.split("&")
 
     for fs in filters_and_selections:
@@ -180,7 +180,7 @@ def test_select_n_cols():
             select = fs[8:]
 
     select_list = select.split(', ')
-    data = cbsodata.get_data('82070ENG', select=select_list[0:2])
+    data = opendata.get_data('82070ENG', select=select_list[0:2])
 
     assert len(data[0].keys()) == 2
     assert len(data[5].keys()) == 2
@@ -192,18 +192,18 @@ def test_get_table_list_derden(table_id):
 
     # option 1
     print("global")
-    cbsodata.options.catalog_url = 'dataderden.cbs.nl'
-    data_option1 = cbsodata.get_table_list()
-    cbsodata.options.catalog_url = 'opendata.cbs.nl'
+    opendata.options.catalog_url = 'dataderden.cbs.nl'
+    data_option1 = opendata.get_table_list()
+    opendata.options.catalog_url = 'opendata.cbs.nl'
 
     # option 2
     print("context")
-    with cbsodata.catalog('dataderden.cbs.nl'):
-        data_option2 = cbsodata.get_table_list()
+    with opendata.catalog('dataderden.cbs.nl'):
+        data_option2 = opendata.get_table_list()
 
     # option 3
     print("argument")
-    data_option3 = cbsodata.get_table_list(
+    data_option3 = opendata.get_table_list(
         catalog_url='dataderden.cbs.nl'
     )
 
@@ -220,18 +220,18 @@ def test_get_data_derden(table_id):
 
     # option 1
     print("global")
-    cbsodata.options.catalog_url = 'dataderden.cbs.nl'
-    data_option1 = cbsodata.get_data(table_id)
-    cbsodata.options.catalog_url = 'opendata.cbs.nl'
+    opendata.options.catalog_url = 'dataderden.cbs.nl'
+    data_option1 = opendata.get_data(table_id)
+    opendata.options.catalog_url = 'opendata.cbs.nl'
 
     # option 2
     print("context")
-    with cbsodata.catalog('dataderden.cbs.nl'):
-        data_option2 = cbsodata.get_data(table_id)
+    with opendata.catalog('dataderden.cbs.nl'):
+        data_option2 = opendata.get_data(table_id)
 
     # option 3
     print("argument")
-    data_option3 = cbsodata.get_data(
+    data_option3 = opendata.get_data(
         table_id,
         catalog_url='dataderden.cbs.nl'
     )
