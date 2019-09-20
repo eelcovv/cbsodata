@@ -29,6 +29,11 @@ import sys
 
 from cbsodata.cbsodata3 import (get_data, get_table_list, get_info)
 
+try:
+    from cbsodata import __version__
+except ModuleNotFoundError:
+    __version__ = "unknown"
+
 AVAILABLE_CMDS = ["data", "info", "list"]
 
 
@@ -241,7 +246,8 @@ def main():
         )
         parser.add_argument(
             "--version",
-            action='store_true',
+            action='version',
+            version=f"CBSOData version: {__version__}",
             help="show the package version")
 
         args = parser.parse_args()
