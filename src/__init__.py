@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2019 Jonathan de Bruin
 
 #  Permission is hereby granted, free of charge, to any person
@@ -23,6 +24,17 @@
 
 """Statistics Netherlands opendata API client for Python"""
 
-from cbsodata.cbsodata3 import *
+from pkg_resources import get_distribution, DistributionNotFound
+import logging
+from logging import NullHandler
 
-__version__ = "1.2.2"
+# Set default logging handler to avoid "No handler found" warnings.
+logging.getLogger(__name__).addHandler(NullHandler())
+
+# let the version control depend on the git tag and sha key.
+try:
+    # Change here if project is renamed and does not equal the package name
+    dist_name = __name__
+    __version__ = get_distribution(dist_name).version
+except DistributionNotFound:
+    __version__ = 'unknown'

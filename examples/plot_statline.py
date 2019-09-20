@@ -1,23 +1,18 @@
-import matplotlib.pyplot as plt
 import sys
+import logging
+import matplotlib.pyplot as plt
+from cbsodata.utils import StatLineTable
 
-from cbs_utils.misc import (create_logger, merge_loggers)
-from cbs_utils.plotting import CBSPlotSettings
-from cbs_utils.readers import StatLineTable
-
-fig_properties = CBSPlotSettings()
-
-logger = create_logger()
-merge_loggers(logger, logger_name_to_merge="cbs_utils.readers")
+logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.INFO, stream=sys.stdout)
+logger = logging.getLogger()
 
 # de tabel id kan je vinden door naar de data set te gaan op statline en in de url op te zoeken.
 # in dit geval is de url: https://opendata.cbs.nl/#/CBS/nl/dataset/84410NED/table?ts=1568706226304
 # dus we gaan een plaatje maken uit de tabel 84410NED
 table_id = "84410NED"
 
-statline = StatLineTable(table_id=table_id, plot_all_questions=True, make_the_plots=True, save_plot=True)
-
-sys.exit(0)
+statline = StatLineTable(table_id=table_id, make_the_plots=True, show_plot=False,
+                         save_plot=True, modules_to_plot=[1, 46])
 
 statline.show_module_table(max_width=30)
 statline.show_question_table(max_width=30)
@@ -27,10 +22,7 @@ statline.show_question_table(max_width=30)
 statline.modules_to_plot = 46
 
 statline.plot()
-
-# only save the first figure for inspection
-fig = plt.figure(1)
-fig.savefig("firstplot.png")
+statline.close_plots()
 
 # toon de inhoud van de data nog een keer
 statline.show_selection()
@@ -70,4 +62,4 @@ axis.xaxis.grid(True)
 axis.yaxis.grid(False)
 axis.invert_yaxis()
 
-fig.savefig("secondplot.png")
+plt.show()

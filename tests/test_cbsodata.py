@@ -3,7 +3,7 @@ import shutil
 
 import requests
 
-import cbsodata
+import cbsodata3 as cbsodata
 
 # testing deps
 import pytest

@@ -35,6 +35,7 @@ from contextlib import contextmanager
 import requests
 from requests import Session, Request
 
+logger = logging.getLogger(__name__)
 
 CBSOPENDATA = "opendata.cbs.nl"  # deprecate in next version
 API = "ODataApi/odata"
@@ -70,7 +71,7 @@ class OptionsManager(object):
         setattr(self, arg, value)
 
     def _log_setting_change(self, setting_name, old_value, new_value):
-        logging.info(
+        logger.info(
             "Setting '{}' changed from '{}' to '{}'.".format(
                 setting_name, old_value, new_value)
         )
@@ -102,7 +103,6 @@ options = OptionsManager()
 
 
 def _get_catalog_url(url):
-
     return options.catalog_url if url is None else url
 
 
@@ -146,7 +146,6 @@ def _download_metadata(table_id, metadata_name, select=None, filters=None,
             s = Session()
             p = Request('GET', url, params=params).prepare()
 
-
             try:
                 r = s.send(p, proxies=proxies)
             except requests.exceptions.SSLError:
@@ -154,7 +153,7 @@ def _download_metadata(table_id, metadata_name, select=None, filters=None,
                 url = url.replace("https", "http")
                 p = Request('GET', url, params=params).prepare()
                 r = s.send(p)
-            logging.info("Download " + p.url)
+            logger.info("Download " + p.url)
             r.raise_for_status()
 
             res = r.json(encoding='utf-8')
@@ -334,7 +333,7 @@ def get_table_list(select=None, filters=None, catalog_url=None, proxies=None):
         s = Session()
         p = Request('GET', url, params=params).prepare()
 
-        logging.info("Download " + p.url)
+        logger.info("Download " + p.url)
 
         r = s.send(p, proxies=_proxies)
         r.raise_for_status()

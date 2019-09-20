@@ -94,3 +94,5 @@ ENV/
 
 # PyCharm
 .idea
+cache
+images

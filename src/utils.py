@@ -84,8 +84,8 @@ class StatLineTable(object):
         By default, the opendata is stored to cache first and then converted from the json format
         to a proper DataFrame. This DataFrame is stored to cache in case *to_pickle* is set to
         True. In case a pickle file is found in the case, the DataFrame is directly obtained from
-        the case (speeding up processing/home/eelco/PycharmProjects/CBS/cbs_utils time). If you want to regenerate the picke file, set this
-        flag to true (or just empty the cache)
+        the case (speeding up processing/home/eelco/PycharmProjects/CBS/cbs_utils time). If you want
+        to regenerate the picke file, set this flag to true (or just empty the cache)
     section_key: str, optional
         Default column name to refer to a section. Default = "Section"
     title_key: str, optional
@@ -159,7 +159,7 @@ class StatLineTable(object):
         following values a taken::
 
              loc: (0.02, 0.97),
-             color: "cbs:corporateblauw",
+             color: "blue",
              size: 12
 
     module_title_properties: dict, optional
@@ -167,7 +167,7 @@ class StatLineTable(object):
         the  following values are taken::
 
              loc: (0.02, 0.94),
-             color: "cbs:corporateblauw",
+             color: "blue",
              size: 12
 
     question_title_properties: dict, optional
@@ -175,7 +175,7 @@ class StatLineTable(object):
         means the  following values are taken::
 
              loc: (0.02, 0.91),
-             color: "cbs:grasgroen",
+             color: "blue",
              size: 12
 
     make_the_plots: bool, optional
@@ -187,7 +187,7 @@ class StatLineTable(object):
         If true, the labels of the columns names are rotated when writing the tables to latex
         format. Rotation is done by adding the *rot* command to the columns names, which is not a
         standard Latex commando. Therefore, in order to use this in latex, you need to add the
-        following to your preable::
+        following to your preamble::
 
                 \\newcolumntype {R}[2] { %
                     > {\\adjustbox {angle =  # 1,lap=\\width-(#2)}\\bgroup}%
@@ -198,6 +198,10 @@ class StatLineTable(object):
 
     write_info_to_image_dir: bool, optional
         Write the information of the data structure to a file in the image directory. Default = True
+    color: str, optional
+        Color for the plot. Default = "blue".
+    fontsize: int, optional
+        Font sizefor the plot. Default = 12
 
     Attributes
     ----------
@@ -291,6 +295,8 @@ class StatLineTable(object):
                  describe_the_data: bool = False,
                  write_info_to_image_dir: bool = True,
                  rotate_latex_columns: bool = False,
+                 color="blue",
+                 fontsize=12,
                  ):
         """
 
@@ -317,6 +323,9 @@ class StatLineTable(object):
         self.plot_all_modules = plot_all_modules
         self.plot_all_questions = plot_all_questions
 
+        self.color = color
+        self.fontsize = fontsize
+
         x_start = 0.02
         y_start = 0.97
         delta_y = 0.03
@@ -324,17 +333,18 @@ class StatLineTable(object):
             self.survey_title_properties = survey_title_properties
         else:
             self.survey_title_properties = dict(loc=(x_start, y_start),
-                                                color="cbs:corporateblauw", size=12)
+                                                color=self.color,
+                                                size=self.fontsize)
         if module_title_properties is not None:
             self.module_title_properties = module_title_properties
         else:
             self.module_title_properties = dict(loc=(x_start, y_start - delta_y),
-                                                color="cbs:corporateblauw", size=12)
+                                                color="blue", size=12)
         if question_title_properties is not None:
             self.question_title_properties = question_title_properties
         else:
             self.question_title_properties = dict(loc=(x_start, y_start - 2 * delta_y),
-                                                  color="cbs:grasgroen", size=12)
+                                                  color="blue", size=12)
 
         self.apply_selection = apply_selection
         self.selection = selection
@@ -536,9 +546,9 @@ class StatLineTable(object):
             logger.info(f"Importing table {self.table_id} and store to {self.output_directory}")
             # We cannot import the cbsodata module when using the debugger in PyCharm, therefore
             # only call import here
-            import cbsodata
+            from cbsodata import cbsodata3 as opendata
             try:
-                cbsodata.get_data(self.table_id, dir=str(self.output_directory))
+                opendata.get_data(self.table_id, dir=str(self.output_directory))
             except requests.exceptions.SSLError as err:
                 logger.warning("Could not connect to opendata.cbs.nl. Check your connections")
                 raise err
@@ -890,6 +900,10 @@ class StatLineTable(object):
 
         return result_df
 
+    @staticmethod
+    def close_plots():
+        plt.close("all")
+
     def plot(self):
         """
         Loop over all the modules and plot all questions per module
@@ -1171,8 +1185,6 @@ class StatLineTable(object):
         file_base = re.sub("[()/]", "", file_base)
         file_name = Path(file_base + self.image_type)
         image_name = self.image_dir / file_name
-
-        add_cbs_logo_to_plot(fig=fig)
 
         if self.save_plot:
             logger.info(f"Saving image to {image_name}")
