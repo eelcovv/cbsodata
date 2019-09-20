@@ -1,3 +1,8 @@
+=======
+Authors
+=======
+* Jonathan de Bruin <jonathandebruin@gmail.com>
+
 ============
 Contributors
 ============

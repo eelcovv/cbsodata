@@ -2,9 +2,12 @@
 Changelog
 =========
 
-Version 0.1
+Version 1.3
 ===========
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+Changed structure in pyscaffold to import importing of module and version control
+
+Version 1.2
+===========
+
+Latest version before pyscaffold structure change
