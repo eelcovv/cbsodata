@@ -441,8 +441,9 @@ class StatLineTable(object):
         col_sel = [self.key_key, self.title_key, self.units_key]
         self.question_info_df = self.question_df[col_sel].drop_duplicates()
 
-        col_sel = [self.parent_id_key, self.title_key]
-        self.module_info_df = self.section_df[col_sel].drop_duplicates()
+        if not self.section_df.empty:
+            col_sel = [self.parent_id_key, self.title_key]
+            self.module_info_df = self.section_df[col_sel].drop_duplicates()
 
     def write_info(self):
         """
@@ -603,7 +604,7 @@ class StatLineTable(object):
                 n_sec += 1
                 keys = [_ for _ in list(indicator.keys()) if _ not in section_columns]
                 section_columns.extend(keys)
-            elif indicator["Type"] == "Dimension":
+            elif indicator["Type"] in ("Dimension", "TimeDimension"):
                 n_dim += 1
                 keys = [_ for _ in list(indicator.keys()) if _ not in dimension_columns]
                 dimension_columns.extend(keys)
@@ -657,7 +658,7 @@ class StatLineTable(object):
                         # to None
                         self.level_ids[self.level_keys[this_level]] = None
 
-            if data_props.type == "Dimension":
+            if data_props.type in ("Dimension", "TimeDimension"):
                 # the current block is a dimension. Store it to the dimensions_df
                 logger.debug(f"Reading dimension properties {data_props.key}")
                 for key, value in indicator.items():
@@ -708,8 +709,16 @@ class StatLineTable(object):
         # ID as an index
         self.section_df.dropna(axis=0, inplace=True, how="all")
         self.section_df.dropna(axis=1, inplace=True, how="all")
-        self.section_df.set_index("ID", inplace=True, drop=True)
-        self.section_df.drop(["odata.type", "Type", "Key"], axis=1, inplace=True)
+        if not self.section_df.empty:
+            try:
+                self.section_df.set_index("ID", inplace=True, drop=True)
+            except KeyError:
+                self.section_df = None
+            else:
+                try:
+                    self.section_df.drop(["odata.type", "Type", "Key"], axis=1, inplace=True)
+                except KeyError:
+                    self.section_df = None
 
         # Based on the the level id which we have stored in the L0, L1, L2, L3 column we are going
         # to build a complete description of the module/section/subsection leading to the current
@@ -736,8 +745,16 @@ class StatLineTable(object):
             # to the Section column
             self.question_df.loc[index, self.section_key] = section_title
 
-        # finally, we can drop any empty column in case we have any to make it cleaning
+        # finally, we can drop any empty column in case we have any to make it cleaner
         self.question_df.dropna(axis=1, inplace=True, how="all")
+
+        # we may of lost a level if the structure was not deep enough. Update the levels
+        common_levels = self.question_df.columns.intersection(self.level_keys)
+        missing_levels = set(self.level_keys).difference(set(common_levels))
+        for level in list(missing_levels):
+            self.level_keys.remove(level)
+            del self.level_ids[level]
+        self.max_levels = len(self.level_keys)
 
         logger.debug("Done reading data ")
 
@@ -818,10 +835,12 @@ class StatLineTable(object):
                 df = dataframe_clip_strings(self.question_info_df.copy(), max_width)
             else:
                 df = self.question_info_df
-            logger.info("Structure of all questions\n{}".format(
-                tabulate(df, headers="keys", tablefmt="psql")))
+            df_table = tabulate(df, headers="keys", tablefmt="psql")
+            logger.info("Structure of all questions\n{}".format(df_table))
         else:
             logger.info("Structure of all questions\n{}".format(self.question_info_df))
+
+        return df_table
 
     def show_module_table(self, max_width=None):
         """
@@ -833,10 +852,12 @@ class StatLineTable(object):
                 df = dataframe_clip_strings(self.module_info_df.copy(), max_width)
             else:
                 df = self.module_info_df
-            logger.info("Structure of all modules\n{}".format(
-                tabulate(df, headers="keys", tablefmt="psql")))
+            df_table = tabulate(df, headers="keys", tablefmt="psql")
+            logger.info("Structure of all modules\n{}".format(df_table))
         else:
             logger.info("Structure of all modules\n{}".format(self.module_info_df))
+
+        return df_table
 
     def show_selection(self):
         """
@@ -848,6 +869,8 @@ class StatLineTable(object):
                         "".format(self.selection_options))
         else:
             logger.info("The available index are stored after the first plot")
+
+        return self.selection_options
 
     def get_question_df(self, question_id: int):
         """
