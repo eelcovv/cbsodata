@@ -262,7 +262,7 @@ Selecting only the *2* and *3-5* size class  can be done as
 
 We are now ready to retrieve all the data belonging to the question
 'Gebruikte ICT-veiligheidsmaatregelen' for the two size classes selected. Let's
-get the data::
+get the data:
 
 .. code:: python
 
