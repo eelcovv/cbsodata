@@ -211,7 +211,7 @@ the structure of the survey as follows:
 
     >>> stat_line.show_module_table(max_rows=18)
 
-This will print the first 18 rows of the structures::
+This will print the first 18 rows of the questionnaire structure::
 
     +------+------------+----------------------------------------+
     |   ID |   ParentID | Title                                  |
