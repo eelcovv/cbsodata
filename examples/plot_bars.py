@@ -8,7 +8,7 @@ stat_line = StatLineTable(table_id="84410NED", apply_selection = True,
 # select all the items beloning to question 47
 df = stat_line.get_question_df(47)
 
-# retrieve the units from the first item
+# retrieve the module and questgion title and units from the data frame
 units = df[stat_line.units_key].values[0]
 section_title = df[stat_line.section_key].values[0]
 module_title, question_title = section_title.split("\n")
