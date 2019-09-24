@@ -257,6 +257,7 @@ class StatLineTable(object):
     """
 
     def __init__(self, table_id,
+                 catalog_url: str = None,
                  reset: bool = False,
                  cache_dir_name: str = "cache",
                  image_dir_name: str = "images",
@@ -305,6 +306,7 @@ class StatLineTable(object):
         """
 
         self.table_id = table_id
+        self.catalog_url = catalog_url
         self.reset = reset
         self.max_levels = max_levels
         self.sort_choices = sort_choices
@@ -551,7 +553,8 @@ class StatLineTable(object):
             # only call import here
             from cbsodata import cbsodata3 as opendata
             try:
-                opendata.get_data(self.table_id, dir=str(self.output_directory))
+                opendata.get_data(self.table_id, dir=str(self.output_directory),
+                                  catalog_url=self.catalog_url)
             except requests.exceptions.SSLError as err:
                 logger.warning("Could not connect to opendata.cbs.nl. Check your connections")
                 raise err

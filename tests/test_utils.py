@@ -12,22 +12,32 @@ from cbsodata.utils import StatLineTable, dataframe_clip_strings
 # testing deps
 import pytest
 
-logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.WARNING)
 logger = logging.getLogger()
 
 DATASETS = [
-     '84410NED',
-     '82010NED',
-     '80884ENG'
-    ]
+    '84410NED',
+    '82010NED',
+    '80884ENG'
+]
 DATASETS_DERDEN = [
     '47003NED',
     '47005NED'
 ]
+DATASETS_ALL = DATASETS + DATASETS_DERDEN
+URL_DERDEN = "dataderden.cbs.nl"
 
 DATA_DIR = 'data'  # this directory should be keps in the repository, it is used to validate
 TEST_ENV = 'test_env'  # this directory is cleared after running
 COMPRESSION = "zip"
+
+
+def pick_url(table_id):
+    if table_id in DATASETS_DERDEN:
+        url = URL_DERDEN
+    else:
+        url = None
+    return url
 
 
 def table_file_name(table_id, base_name="question_df", data_format=".pkl"):
@@ -41,31 +51,38 @@ def write_data():
         os.makedirs(DATA_DIR)
 
     for table_id in DATASETS:
-        statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV,
-                                 image_dir_name=TEST_ENV)
-        question_df = statline.question_df
+        dump_data_table_to_pickle(table_id=table_id)
 
-        file_name = table_file_name(table_id=table_id)
-        logger.info("Writing test data frame {}".format(file_name))
-        question_df.to_pickle(file_name, compression=COMPRESSION)
+    for table_id in DATASETS_DERDEN:
+        dump_data_table_to_pickle(table_id=table_id, url=URL_DERDEN)
 
-        file_name = table_file_name(table_id=table_id, base_name="question_info")
-        question_info = statline.show_question_table()
-        logger.info("Writing question table {}".format(file_name))
-        with open(file_name, "wb") as fp:
-            pickle.dump(question_info, fp)
 
-        file_name = table_file_name(table_id=table_id, base_name="module_table")
-        module_table = statline.show_module_table()
-        logger.info("Writing modules table {}".format(file_name))
-        with open(file_name, "wb") as fp:
-            pickle.dump(module_table, fp)
+def dump_data_table_to_pickle(table_id, url=None):
+    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV,
+                             image_dir_name=TEST_ENV, catalog_url=url)
+    question_df = statline.question_df
 
-        file_name = table_file_name(table_id=table_id, base_name="selection")
-        selection = statline.show_selection()
-        logger.info("Writing modules table {}".format(file_name))
-        with open(file_name, "wb") as fp:
-            pickle.dump(selection, fp)
+    file_name = table_file_name(table_id=table_id)
+    logger.info("Writing test data frame {}".format(file_name))
+    question_df.to_pickle(file_name, compression=COMPRESSION)
+
+    file_name = table_file_name(table_id=table_id, base_name="question_info")
+    question_info = statline.show_question_table()
+    logger.info("Writing question table {}".format(file_name))
+    with open(file_name, "wb") as fp:
+        pickle.dump(question_info, fp)
+
+    file_name = table_file_name(table_id=table_id, base_name="module_table")
+    module_table = statline.show_module_table()
+    logger.info("Writing modules table {}".format(file_name))
+    with open(file_name, "wb") as fp:
+        pickle.dump(module_table, fp)
+
+    file_name = table_file_name(table_id=table_id, base_name="selection")
+    selection = statline.show_selection()
+    logger.info("Writing modules table {}".format(file_name))
+    with open(file_name, "wb") as fp:
+        pickle.dump(selection, fp)
 
 
 def setup_module(module):
@@ -81,13 +98,12 @@ def teardown_module(module):
     shutil.rmtree(TEST_ENV)
 
 
-# Tests
-
-
-@pytest.mark.parametrize("table_id", DATASETS)
+@pytest.mark.parametrize("table_id", DATASETS_ALL)
 def test_question_df(table_id):
     # testing
-    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV)
+    url = pick_url(table_id)
+    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV,
+                             catalog_url=url)
     question_df = statline.question_df
 
     file_name = table_file_name(table_id=table_id)
@@ -96,10 +112,11 @@ def test_question_df(table_id):
     assert_frame_equal(question_df, question_df_expect)
 
 
-@pytest.mark.parametrize("table_id", DATASETS)
+@pytest.mark.parametrize("table_id", DATASETS_ALL)
 def test_question_info(table_id):
-    # testing
-    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV)
+    url = pick_url(table_id)
+    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV,
+                             catalog_url=url)
     question_info = statline.show_question_table()
 
     file_name = table_file_name(table_id=table_id, base_name="question_info")
@@ -109,10 +126,12 @@ def test_question_info(table_id):
     assert question_info == question_info_expect
 
 
-@pytest.mark.parametrize("table_id", DATASETS)
+@pytest.mark.parametrize("table_id", DATASETS_ALL)
 def test_module_info(table_id):
     # testing
-    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV)
+    url = pick_url(table_id)
+    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV,
+                             catalog_url=url)
     question_info = statline.show_module_table()
 
     file_name = table_file_name(table_id=table_id, base_name="module_table")
@@ -122,10 +141,11 @@ def test_module_info(table_id):
     assert question_info == question_info_expect
 
 
-@pytest.mark.parametrize("table_id", DATASETS)
+@pytest.mark.parametrize("table_id", DATASETS_ALL)
 def test_selection(table_id):
-    # testing
-    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV)
+    url = pick_url(table_id)
+    statline = StatLineTable(table_id=table_id, cache_dir_name=TEST_ENV, image_dir_name=TEST_ENV,
+                             catalog_url=url)
     selection = statline.show_selection()
 
     file_name = table_file_name(table_id=table_id, base_name="selection")
