@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from cbsodata.utils import StatLineTable
 
 # load the statline data
-stat_line = StatLineTable(table_id="84410NED", apply_selection = True,
-        selection=['2 werkzame personen', '3 tot 5 werkzame personen'])
+stat_line = StatLineTable(table_id="84410NED", apply_selection=True,
+                          selection=['2 werkzame personen', '3 tot 5 werkzame personen'])
 
 # select all the items beloning to question 47
 df = stat_line.get_question_df(47)
@@ -28,14 +28,12 @@ df.plot(kind='barh', ax=ax)
 ax.set_ylabel("")
 ax.set_xlabel(units)
 
-cmap = plt.get_cmap("tab10")
 plt.figtext(0.05, 0.95, module_title, color="blue")
 plt.figtext(0.05, 0.90, question_title, color="green")
- 
 
 ax.xaxis.set_label_coords(0.98, -0.1)
 ax.legend(bbox_to_anchor=(0.01, 0.00), ncol=2,
-        bbox_transform=fig.transFigure, loc="lower left", frameon=False)
+          bbox_transform=fig.transFigure, loc="lower left", frameon=False)
 for side in ["top", "bottom", "right"]:
     ax.spines[side].set_visible(False)
 ax.spines['left'].set_position('zero')
