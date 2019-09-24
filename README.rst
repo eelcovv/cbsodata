@@ -288,7 +288,7 @@ The pandas data *question_df* now looks like this::
     +------------------------------------------+-----------------------+-----------------------------+
 
 
-You can plot it with the normal pandas plotting method. The whole series of command
+You can plot it with the normal pandas plotting method. The whole series of commands
 to make the plot looks like this:
 
 .. plot:: ../examples/plot_bars.py
