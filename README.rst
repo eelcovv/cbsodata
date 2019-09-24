@@ -176,12 +176,157 @@ DataFrame with the code below.
     >>> data = pandas.DataFrame(cbsodata.get_data('82070ENG'))
     >>> data.head()
 
-The list of tables can be turned into a pandas DataFrame as well.
 
 .. code:: python
 
     >>> tables = pandas.DataFrame(cbsodata.get_table_list())
     >>> tables.head()
+
+This will put use a list of values for all variables in one flat dataframe. The
+structure of the statline data is lost.
+
+StatLineTable
+~~~~~~~~~~~~~
+
+Howver, starting from *cbsodata* version 1.3, we also have to ability to get a
+selection of variables belonging to one question. Also, the units and dimensions can
+now easily retrieved. This is done by using the new *StatLineTable* class
+
+
+Let start with showing how to import the data from a table:
+
+.. code:: python
+
+    >>> from cbsodata.utils import StatLineTable
+    >>> stat_line = StatLineTable(table_id="84410NED")
+
+This loads the statline data from the survey 'ICT-usage of companies for varying
+company size class', which can be found here:  OpenDATAICT_
+
+A typical statline table is organised into 'modules' (questions belonging to one topic),
+'submodules', and questions. One question can again contain several options. We can inspect
+the structure of the survey as follows:
+
+.. code:: python
+
+    >>> stat_line.show_module_table(max_rows=18)
+
+This will print the first 18 rows of the structures::
+
+    +------+------------+----------------------------------------+
+    |   ID |   ParentID | Title                                  |
+    |------+------------+----------------------------------------|
+    |    1 |            | Personeel en ICT                       |
+    |    4 |          1 | ICT-specialisten                       |
+    |    9 |          1 | ICT-beveiliging/bescherming data       |
+    |   13 |            | Toegang en gebruik internet            |
+    |   14 |         13 | Bedrijven met website                  |
+    |   16 |         14 | Website bevat                          |
+    |   23 |            | Cloud-diensten                         |
+    |   25 |         23 | Type cloud-diensten                    |
+    |   33 |         25 | Type server                            |
+    |   36 |            | Big-data-analyse                       |
+    |   38 |         36 | Bronnen big data voor analyse          |
+    |   43 |         36 | Wie analyseerde big data               |
+    |   46 |            | ICT-veiligheid                         |
+    |   47 |         46 | Gebruikte ICT-veiligheidsmaatregelen   |
+    |   60 |         46 | Optreden van ICT veiligheidsincidenten |
+    |   65 |         46 | Oorzaken van ICT veiligheidsincidenten |
+    |   72 |         46 | Kosten ICT-veiligheidsincidenten       |
+    |   79 |         46 | Uitvoeren updates (security patching)  |
+    +------+------------+----------------------------------------+
+
+This table contains ICT-usage of company for varying company size class. In case you want
+to inspect which size classes are availeble you can do
+
+.. code:: python
+
+    >>> stat_line.show_selection()
+
+Which give the following output::
+
+    Index(['2 of meer werkzame personen', '2 tot 250 werkzame personen',
+           '2 werkzame personen', '3 tot 5 werkzame personen',
+           '5 tot 10 werkzame personen', '10 tot 20 werkzame personen',
+           '20 tot 50 werkzame personen', '50 tot 100 werkzame personen',
+           '100 tot 250 werkzame personen', '250 tot 500 werkzame personen',
+           '500 of meer werkzame personen'],
+          dtype='object', name='Bedrijfsgrootte')
+
+Selecting only the *2* and *3-5* size class  can be done as
+
+.. code:: python
+
+    >>> stat_line.selection = ['2 werkzame personen', '3 tot 5 werkzame personen']
+    >>> stat_line.apply_selection = True
+
+We are now ready to retrieve all the data belonging to the question
+'Gebruikte ICT-veiligheidsmaatregelen' for the two size classes selected. Let get the data
+
+.. code:: python
+
+    >>> question_df = stat_line.get_question_df(47)
+    >>> question_df = stat_line.prepare_data_frame(question_df)
+
+The pandas data *question_df* now looks like this::
+
+    +------------------------------------------+-----------------------+-----------------------------+
+    | Title                                    |   2 werkzame personen |   3 tot 5 werkzame personen |
+    |------------------------------------------+-----------------------+-----------------------------|
+    | Antivirussoftware                        |                    82 |                          86 |
+    | Beleid voor sterke wachtwoorden          |                    56 |                          60 |
+    | Authenticatie via soft of hardware-token |                    24 |                          29 |
+    | Encryptie voor het opslaan van data      |                    19 |                          24 |
+    | Encryptie voor het versturen van data    |                    20 |                          25 |
+    | Gegevens op andere fysieke locatie       |                    57 |                          66 |
+    | Network access control                   |                    22 |                          34 |
+    | VPN bij internetgebruik buiten het eigen |                    19 |                          28 |
+    | Logbestanden voor analyse incidenten     |                    20 |                          27 |
+    | Methodes voor beoordelen ITC-veiligheid  |                    14 |                          21 |
+    | Risicoanalyses                           |                    15 |                          21 |
+    | Andere maatregelen                       |                     9 |                          13 |
+    +------------------------------------------+-----------------------+-----------------------------+
+
+
+You can plot it with the normal pandas plotting method. The whole series of command
+to make the plot looks like this:
+
+.. plot:: examples/plot_bars.py
+
+
+    >>> import matplotlib.pyplot as plt
+    >>> from cbsodata.utils import StatLineTable
+    >>> std = StatLineTable(table_id="84410NED")
+    >>> std.selection = ['2 werkzame personen', '3 tot 5 werkzame personen']
+    >>> std.apply_selection = True
+    >>> std.prepare_all_data()
+
+    >>> df = std.get_question_df(47)
+    >>> units = df[std.units_key].values[0]
+    >>> df = std.prepare_data_frame(df)
+
+    >>> fig, ax = plt.subplots()
+    >>> fig.subplots_adjust(left=0.5, bottom=0.25, top=0.98)
+
+    >>> ax.set_ylabel("")
+    >>> ax.set_xlabel(units)
+
+    >>> ax.xaxis.set_label_coords(0.98, -0.1)
+    >>> ax.legend(bbox_to_anchor=(0.01, 0.00), ncol=2,
+                bbox_transform=fig.transFigure, loc="lower left", frameon=False)
+    >>> for side in ["top", "bottom", "right"]:
+            ax.spines[side].set_visible(False)
+    >>> ax.spines['left'].set_position('zero')
+    >>> ax.tick_params(which="both", bottom=False, left=False)
+    >>> ax.xaxis.grid(True)
+    >>> ax.yaxis.grid(False)
+    >>> ax.invert_yaxis()
+    >>> df.plot(kind='barh', ax=ax)
+    >>> plt.show()
+
+
+.. _OpenDATAICT:
+    https://opendata.cbs.nl/statline/#/CBS/nl/dataset/84410NED/table?ts=1560412027927
 
 
 Command Line Interface

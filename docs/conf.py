@@ -66,7 +66,11 @@ except Exception as e:
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
               'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon']
+              'sphinx.ext.napoleon',
+              'matplotlib.sphinxext.plot_directive',
+              'sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

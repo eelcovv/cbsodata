@@ -58,6 +58,8 @@ class StatLineTable(object):
     table_id: str
         ID of the table to read, e.g. '84408NED'. The table ID can be found in the URL of the
         corresponding opendata URL. In this example: `OpenData`_
+    catalog_url: str, optional
+        Url holding the statline data. Default = None, which means opendata is taken
     reset: bool, optional
         In case opendata is read, all the files are written to cache. The next time you run the
         function, the data is read from cache, except when *reset* is True. In that case the
@@ -219,40 +221,130 @@ class StatLineTable(object):
 
     An example of using the StatLineTable utility is given now
 
-    >>> stat_line = StatLineTable(table_id="84408NED", to_sql=True, to_xls=True)
+    >>> stat_line = StatLineTable(table_id="84410NED")
 
-    This reads the stat line table '84408NED' and stores the results to a sqlite database
+    This reads the stat line table '84408NED' The table can be found at the following URL:
 
-    The dataframes are accessible as:
+    https://opendata.cbs.nl/statline/#/CBS/nl/dataset/84410NED/table?ts=1569332230055
 
-    >>> stat_line.question_df.info()
+    It is the statline data of the survey 'ICT-gebruik bij kleine bedrijven; bedrijfsgrootte, 2018'
+
+    The structure of the table can be inspected as
+
+    >>> table_head = stat_line.show_module_table(max_rows=18)
+    +------+------------+----------------------------------------+
+    |   ID |   ParentID | Title                                  |
+    |------+------------+----------------------------------------|
+    |    1 |            | Personeel en ICT                       |
+    |    4 |          1 | ICT-specialisten                       |
+    |    9 |          1 | ICT-beveiliging/bescherming data       |
+    |   13 |            | Toegang en gebruik internet            |
+    |   14 |         13 | Bedrijven met website                  |
+    |   16 |         14 | Website bevat                          |
+    |   23 |            | Cloud-diensten                         |
+    |   25 |         23 | Type cloud-diensten                    |
+    |   33 |         25 | Type server                            |
+    |   36 |            | Big-data-analyse                       |
+    |   38 |         36 | Bronnen big data voor analyse          |
+    |   43 |         36 | Wie analyseerde big data               |
+    |   46 |            | ICT-veiligheid                         |
+    |   47 |         46 | Gebruikte ICT-veiligheidsmaatregelen   |
+    |   60 |         46 | Optreden van ICT veiligheidsincidenten |
+    |   65 |         46 | Oorzaken van ICT veiligheidsincidenten |
+    |   72 |         46 | Kosten ICT-veiligheidsincidenten       |
+    |   79 |         46 | Uitvoeren updates (security patching)  |
+    +------+------------+----------------------------------------+
+
+    This prints the modules of the table (all ID's with an empty 'parentID'), optionally,
+    submodules, and questions. This inspection allow you to make a selection of a single module.
+    For instance, in case  we want to plot all the questions belonging to the module
+    'ICT-veiligheid (ID=46), we could have passed the argument *modules_to_plot = [46]* and
+    *apply_selection=True*.
+
+    Before we are going to retrieve the data of this module, we also on to see what dimensions are
+    available. This table contains the data for varying company size ('bedrijfsgrootte'). The
+    size classes available can be inspected by
+
+    >>> stat_line.show_selection()
+    Index(['2 of meer werkzame personen', '2 tot 250 werkzame personen',
+           '2 werkzame personen', '3 tot 5 werkzame personen',
+           '5 tot 10 werkzame personen', '10 tot 20 werkzame personen',
+           '20 tot 50 werkzame personen', '50 tot 100 werkzame personen',
+           '100 tot 250 werkzame personen', '250 tot 500 werkzame personen',
+           '500 of meer werkzame personen'],
+          dtype='object', name='Bedrijfsgrootte')
+
+    Let's assume we do not need all the size classes, but only the 2  and 3-5
+    We can make this selection by doing
+
+    >>> stat_line.selection = ['2 werkzame personen', '3 tot 5 werkzame personen']
+    >>> stat_line.apply_selection = True
+
+    Running the *statline.plot()* method wil dump all the plots belonging to module 46 for
+    the size classes 2 and 20-50. We won't plot here, by only the the selection
+
+    >>> stat_line.prepare_all_data()
+
+    As a last step, let's assume you want to retrieve the rows of only one question, for instance
+    question 47 ('Gebruikte ICT-veiligheidsmaatregelen', see table above). You can do
+
+    >>> question_df = stat_line.get_question_df(47)
+    >>> question_df.info()
     <class 'pandas.core.frame.DataFrame'>
-    Int64Index: 8064 entries, 1 to 192
-    Data columns (total 18 columns):
-    L0                                   8064 non-null object
-    L1                                   8064 non-null object
-    L2                                   7308 non-null object
-    L3                                   3444 non-null object
-    L4                                   672 non-null object
-    Section                              8064 non-null object
-    ID                                   8064 non-null object
-    ParentID                             8064 non-null object
-    Key                                  8064 non-null object
-    Title                                8064 non-null object
-    Description                          6594 non-null object
-    Datatype                             8064 non-null object
-    Unit                                 8064 non-null object
-    Decimals                             8064 non-null object
-    Default                              8064 non-null object
-    BedrijfstakkenBranchesSBI2008        8064 non-null object
-    BedrijfstakkenBranchesSBI2008_Key    8064 non-null object
-    Values                               8064 non-null int64
-    dtypes: int64(1), object(17)
-    memory usage: 1.2+ MB
+    MultiIndex: 132 entries, (48, nan, nan) to (59, nan, nan)
+    Data columns (total 13 columns):
+    Section                132 non-null object
+    ID                     132 non-null object
+    ParentID               132 non-null object
+    Key                    132 non-null object
+    Title                  132 non-null object
+    Description            121 non-null object
+    Datatype               132 non-null object
+    Unit                   132 non-null object
+    Decimals               132 non-null object
+    Default                132 non-null object
+    Bedrijfsgrootte        132 non-null object
+    Bedrijfsgrootte_Key    132 non-null object
+    Values                 132 non-null int64
+    dtypes: int64(1), object(12)
+    memory usage: 14.9+ KB
 
+    As you can see we have a datafrme of 132 rows: 12 items per questions for 11 size classes.
+    The columns contai all available information, such as the Unit of the question. Let print that
+
+    >>> question_df["Unit"].values[0]
+    '% van bedrijven'
+
+    The units is in '% van bedrijven'. We only show the first value, but for all rows it is the same
+    because we are looking to on question
+
+    This data frame is not suitable for plotting yet because the Company size class is still stored
+    as a row. We can fix this by doing
+
+    >>> question_df = stat_line.prepare_data_frame(question_df)
+    >>> print(tabulate(question_df, headers="keys", tablefmt="psql"))
+    +------------------------------------------+-----------------------+-----------------------------+
+    | Title                                    |   2 werkzame personen |   3 tot 5 werkzame personen |
+    |------------------------------------------+-----------------------+-----------------------------|
+    | Antivirussoftware                        |                    82 |                          86 |
+    | Beleid voor sterke wachtwoorden          |                    56 |                          60 |
+    | Authenticatie via soft of hardware-token |                    24 |                          29 |
+    | Encryptie voor het opslaan van data      |                    19 |                          24 |
+    | Encryptie voor het versturen van data    |                    20 |                          25 |
+    | Gegevens op andere fysieke locatie       |                    57 |                          66 |
+    | Network access control                   |                    22 |                          34 |
+    | VPN bij internetgebruik buiten het eigen |                    19 |                          28 |
+    | Logbestanden voor analyse incidenten     |                    20 |                          27 |
+    | Methodes voor beoordelen ITC-veiligheid  |                    14 |                          21 |
+    | Risicoanalyses                           |                    15 |                          21 |
+    | Andere maatregelen                       |                     9 |                          13 |
+    +------------------------------------------+-----------------------+-----------------------------+
+
+    So now we have oranised the data of one question with 12 options (yes/no questions for
+    measures used) for 2 size classes. Plotting can be done with the normal pandas plotting method
 
     .. _OpenData:
-        https://opendata.cbs.nl/statline/#/CBS/nl/dataset/84404NED/table?ts=1560412027927
+        https://opendata.cbs.nl/statline/#/CBS/nl/dataset/84410NED/table?ts=1560412027927
 
     """
 
@@ -301,9 +393,6 @@ class StatLineTable(object):
                  color="blue",
                  fontsize=12,
                  ):
-        """
-
-        """
 
         self.table_id = table_id
         self.catalog_url = catalog_url
@@ -845,7 +934,7 @@ class StatLineTable(object):
 
         return df_table
 
-    def show_module_table(self, max_width=None):
+    def show_module_table(self, max_width=None, max_rows=None):
         """
         Make a nice print of all modules
         """
@@ -855,10 +944,13 @@ class StatLineTable(object):
                 df = dataframe_clip_strings(self.module_info_df.copy(), max_width)
             else:
                 df = self.module_info_df
+            if max_rows is not None:
+                df = df.copy().head(max_rows)
             df_table = tabulate(df, headers="keys", tablefmt="psql")
-            logger.info("Structure of all modules\n{}".format(df_table))
         else:
-            logger.info("Structure of all modules\n{}".format(self.module_info_df))
+            df_table = self.module_info_df
+
+        print(df_table)
 
         return df_table
 
@@ -866,6 +958,8 @@ class StatLineTable(object):
         """
         Show the index of the data frame
         """
+
+        self.prepare_all_data()
 
         if self.selection_options is not None:
             logger.info("You can make a selection from the following values\n{}"
@@ -932,9 +1026,17 @@ class StatLineTable(object):
     def close_plots():
         plt.close("all")
 
-    def plot(self):
+    def prepare_all_data(self):
+        self.plot(only_prepare=True)
+
+    def plot(self, only_prepare=False):
         """
         Loop over all the modules and plot all questions per module
+
+        Parameters
+        ----------
+        only_prepare: bool, optional
+            If true, only prepare the data frames for plotting. Do not plot
         """
         if isinstance(self.modules_to_plot, int):
             # turn modules_to_plot into a list if only a integer was given
@@ -958,7 +1060,8 @@ class StatLineTable(object):
                     logger.debug("\n{}".format(level_df[self.key_key].drop_duplicates()))
                     reported.append(level_id)
 
-                self._plot_module_questions(level_id=level_id, level_df=level_df)
+                self._plot_module_questions(level_id=level_id, level_df=level_df,
+                                            only_prepare=only_prepare)
 
     @staticmethod
     def _remove_all_section_levels(level_df):
@@ -1043,7 +1146,7 @@ class StatLineTable(object):
                 break
         return in_index
 
-    def _plot_module_questions(self, level_id: int, level_df: pd.DataFrame):
+    def _plot_module_questions(self, level_id: int, level_df: pd.DataFrame, only_prepare=False):
         """
         Plot the questions of a module
 
@@ -1053,6 +1156,8 @@ class StatLineTable(object):
             The id number of a module
         level_df: pd.DataFrame
             A pandas dataframe of the current module questions
+        only_prepare:  bool, optional
+            If true, we do not make the plots, only prepare the data frames
         """
 
         if self.questions_to_plot is not None and not self.plot_all_questions:
@@ -1074,7 +1179,7 @@ class StatLineTable(object):
             try:
                 for id, df in sub_level_df.groupby(level=1):
                     logger.debug(f"Calling plot for {level_id}: {id}")
-                    self._plot_module_questions(id, df)
+                    self._plot_module_questions(id, df, only_prepare=only_prepare)
             except ValueError:
                 logger.debug(f"Failed getting next level for {level_id}: {id}")
             finally:
@@ -1082,7 +1187,10 @@ class StatLineTable(object):
 
         logger.debug("Making plot")
 
-        self.make_the_plot(sub_level_df=sub_level_df)
+        if not only_prepare:
+            self.make_the_plot(sub_level_df=sub_level_df)
+        else:
+            self.prepare_data_frame(sub_level_df=sub_level_df)
 
     def prepare_data_frame(self, sub_level_df):
 
