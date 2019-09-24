@@ -291,38 +291,8 @@ The pandas data *question_df* now looks like this::
 You can plot it with the normal pandas plotting method. The whole series of command
 to make the plot looks like this:
 
-.. plot:: examples/plot_bars.py
-
-
-    >>> import matplotlib.pyplot as plt
-    >>> from cbsodata.utils import StatLineTable
-    >>> std = StatLineTable(table_id="84410NED")
-    >>> std.selection = ['2 werkzame personen', '3 tot 5 werkzame personen']
-    >>> std.apply_selection = True
-    >>> std.prepare_all_data()
-
-    >>> df = std.get_question_df(47)
-    >>> units = df[std.units_key].values[0]
-    >>> df = std.prepare_data_frame(df)
-
-    >>> fig, ax = plt.subplots()
-    >>> fig.subplots_adjust(left=0.5, bottom=0.25, top=0.98)
-
-    >>> ax.set_ylabel("")
-    >>> ax.set_xlabel(units)
-
-    >>> ax.xaxis.set_label_coords(0.98, -0.1)
-    >>> ax.legend(bbox_to_anchor=(0.01, 0.00), ncol=2,
-                bbox_transform=fig.transFigure, loc="lower left", frameon=False)
-    >>> for side in ["top", "bottom", "right"]:
-            ax.spines[side].set_visible(False)
-    >>> ax.spines['left'].set_position('zero')
-    >>> ax.tick_params(which="both", bottom=False, left=False)
-    >>> ax.xaxis.grid(True)
-    >>> ax.yaxis.grid(False)
-    >>> ax.invert_yaxis()
-    >>> df.plot(kind='barh', ax=ax)
-    >>> plt.show()
+.. plot:: ../examples/plot_bars.py
+    :include-source:
 
 
 .. _OpenDATAICT:

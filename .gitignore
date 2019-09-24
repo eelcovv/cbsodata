@@ -48,5 +48,9 @@ MANIFEST
 # Per-project virtualenvs
 .venv*/
 
+README.html
+cache
+images
 */cache
 */images
+*/test_env
