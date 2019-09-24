@@ -188,12 +188,12 @@ structure of the statline data is lost.
 StatLineTable
 ~~~~~~~~~~~~~
 
-Howver, starting from *cbsodata* version 1.3, we also have to ability to get a
+Starting from *cbsodata* version 1.3, we also have to ability to get a
 selection of variables belonging to one question. Also, the units and dimensions can
-now easily retrieved. This is done by using the new *StatLineTable* class
+now easily be retrieved. This is done by using the new *StatLineTable* class
 
 
-Let start with showing how to import the data from a table:
+Let's start with showing how to import the data from a table:
 
 .. code:: python
 
@@ -201,7 +201,7 @@ Let start with showing how to import the data from a table:
     >>> stat_line = StatLineTable(table_id="84410NED")
 
 This loads the statline data from the survey 'ICT-usage of companies for varying
-company size class', which can be found here:  OpenDATAICT_
+company size class'. The StatLine table can be found here:  OpenDATAICT_
 
 A typical statline table is organised into 'modules' (questions belonging to one topic),
 'submodules', and questions. One question can again contain several options. We can inspect
@@ -243,7 +243,7 @@ to inspect which size classes are availeble you can do
 
     >>> stat_line.show_selection()
 
-Which give the following output::
+This gives the following output::
 
     Index(['2 of meer werkzame personen', '2 tot 250 werkzame personen',
            '2 werkzame personen', '3 tot 5 werkzame personen',
@@ -261,7 +261,8 @@ Selecting only the *2* and *3-5* size class  can be done as
     >>> stat_line.apply_selection = True
 
 We are now ready to retrieve all the data belonging to the question
-'Gebruikte ICT-veiligheidsmaatregelen' for the two size classes selected. Let get the data
+'Gebruikte ICT-veiligheidsmaatregelen' for the two size classes selected. Let's
+get the data::
 
 .. code:: python
 
