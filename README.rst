@@ -304,8 +304,8 @@ Tutorial
 A jupyter-notebook tutorial how to use *StatLineTable*  can be found here:
 
 * OpenData Reading and Plotting
-    - :download:`../examples/web_scraping_examples.html` (static html)
-    - :download:`../examples/web_scraping_examples.ipynb` (jupyter notebook)
+    - :download:`../examples/statline_plot.html` (static html)
+    - :download:`../examples/statline_plot.ipynb` (jupyter notebook)
 
 
 Command Line Interface
