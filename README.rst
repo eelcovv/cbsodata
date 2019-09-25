@@ -299,6 +299,14 @@ to make the plot looks like this:
 .. _OpenDATAICT:
     https://opendata.cbs.nl/statline/#/CBS/nl/dataset/84410NED/table?ts=1560412027927
 
+Tutorial
+--------
+A jupyter-notebook tutorial how to use *StatLineTable*  can be found here:
+
+* OpenData Reading and Plotting
+    - :download:`../examples/web_scraping_examples.html` (static html)
+    - :download:`../examples/web_scraping_examples.ipynb` (jupyter notebook)
+
 
 Command Line Interface
 ----------------------
