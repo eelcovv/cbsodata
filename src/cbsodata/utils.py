@@ -959,7 +959,11 @@ class StatLineTable(object):
         Show the index of the data frame
         """
 
-        self.prepare_all_data()
+        try:
+            self.prepare_all_data()
+        except ValueError:
+            logger.warning("Selection can not be determined for this table")
+            self.selection_options = None
 
         if self.selection_options is not None:
             logger.info("You can make a selection from the following values\n{}"

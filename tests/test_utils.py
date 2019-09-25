@@ -16,13 +16,13 @@ logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.WARNING)
 logger = logging.getLogger()
 
 DATASETS = [
-    '84410NED',
-    '82010NED',
+    #'84410NED',
+    #'82010NED',
     '80884ENG'
 ]
 DATASETS_DERDEN = [
-    '47003NED',
-    '47005NED'
+    #'47003NED',
+    #'47005NED'
 ]
 DATASETS_ALL = DATASETS + DATASETS_DERDEN
 URL_DERDEN = "dataderden.cbs.nl"
