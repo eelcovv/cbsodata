@@ -973,6 +973,31 @@ class StatLineTable(object):
 
         return self.selection_options
 
+    def scan_module_df(self, module_df, question_id, df_list=None):
+
+        for level_id, level_df in module_df.groupby(level=0):
+            if level_id != question_id:
+                continue
+            else:
+                sub_level_df = self._remove_all_section_levels(level_df)
+                is_question = self._has_equal_number_of_nans(level_id, sub_level_df=sub_level_df)
+                df_list = list()
+                if not is_question:
+                    # the block we have is not a question, because the is an unequal amount of nans
+                    # in the index. Loop over the blocks and call this function again with the
+                    # subsubblocks
+                    logger.debug(f"looping over all levels  for {level_id}")
+                    try:
+                        for id, df in sub_level_df.groupby(level=1):
+                            logger.debug(f"Recursive call for {level_id}: {id}")
+                            df_list.append(self.get_question_df(id, df))
+                    except ValueError:
+                        logger.debug(f"Failed getting next level for {level_id}: {id}")
+                else:
+                    df_list.append(sub_level_df)
+
+        return df_list
+
     def get_question_df(self, question_id: int):
         """
         Get the question belonging to the id *question_id*
@@ -995,25 +1020,9 @@ class StatLineTable(object):
         """
         df_list = None
         for module_id, module_df in self.question_df.groupby(level=0):
-            for level_id, level_df in module_df.groupby(level=1):
-                if level_id != question_id:
-                    continue
-                sub_level_df = self._remove_all_section_levels(level_df)
-                is_question = self._has_equal_number_of_nans(level_id, sub_level_df=sub_level_df)
-                df_list = list()
-                if not is_question:
-                    # the block we have is not a question, because the is an unequal amount of nans
-                    # in the index. Loop over the blocks and call this function again with the
-                    # subsubblocks
-                    logger.debug(f"looping over all levels  for {level_id}")
-                    try:
-                        for id, df in sub_level_df.groupby(level=1):
-                            logger.debug(f"Recursive call for {level_id}: {id}")
-                            df_list.append(self.get_question_df(id, df))
-                    except ValueError:
-                        logger.debug(f"Failed getting next level for {level_id}: {id}")
-                else:
-                    df_list.append(sub_level_df)
+            module_df_sel = module_df.loc[module_id]
+            df_list = self.scan_module_df(module_df=module_df_sel, question_id=question_id,
+                                          df_list=df_list)
 
         if df_list is None:
             logger.warning(f"Could not find any question belonging to {question_id}. Please check ")
