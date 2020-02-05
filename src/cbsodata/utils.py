@@ -1020,7 +1020,7 @@ class StatLineTable(object):
         """
         df_list = None
         for module_id, module_df in self.question_df.groupby(level=0):
-            #module_df_sel = module_df.loc[module_id]
+            # module_df_sel = module_df.loc[module_id]
             df_list = self.scan_module_df(module_df=module_df, question_id=question_id,
                                           df_list=df_list)
 
