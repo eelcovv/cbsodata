@@ -838,15 +838,15 @@ class StatLineTable(object):
             self.question_df.loc[index, self.section_key] = section_title
 
         # finally, we can drop any empty column in case we have any to make it cleaner
-        self.question_df.dropna(axis=1, inplace=True, how="all")
+        #self.question_df.dropna(axis=1, inplace=True, how="all")
 
         # we may of lost a level if the structure was not deep enough. Update the levels
-        common_levels = self.question_df.columns.intersection(self.level_keys)
-        missing_levels = set(self.level_keys).difference(set(common_levels))
-        for level in list(missing_levels):
-            self.level_keys.remove(level)
-            del self.level_ids[level]
-        self.max_levels = len(self.level_keys)
+        #common_levels = self.question_df.columns.intersection(self.level_keys)
+        #missing_levels = set(self.level_keys).difference(set(common_levels))
+        #for level in list(missing_levels):
+        #    self.level_keys.remove(level)
+        #    del self.level_ids[level]
+        #self.max_levels = len(self.level_keys)
 
         logger.debug("Done reading data ")
 
@@ -975,13 +975,14 @@ class StatLineTable(object):
 
     def scan_module_df(self, module_df, question_id, df_list=None):
 
+        if df_list is None:
+            df_list = list()
         for level_id, level_df in module_df.groupby(level=1):
             if level_id != question_id:
                 continue
             else:
                 sub_level_df = self._remove_all_section_levels(level_df)
                 is_question = self._has_equal_number_of_nans(level_id, sub_level_df=sub_level_df)
-                df_list = list()
                 if not is_question:
                     # the block we have is not a question, because the is an unequal amount of nans
                     # in the index. Loop over the blocks and call this function again with the
@@ -1216,13 +1217,19 @@ class StatLineTable(object):
         # we have to create a dataframe with the questions on the indices and all the values
         # per size class in the columns.
         sub_level_df.reset_index(inplace=True)
-        sub_level_df.set_index([self.title_key, self.x_axis_key], drop=True, inplace=True)
+        index = [self.title_key] + self.dimension_df[self.key_key].tolist()
+        sub_level_df.set_index(index, drop=True, inplace=True)
         sub_level_df = sub_level_df[self.value_key]
 
         # keep the original order of the size classes, as unstack is going to sorted
         # alphabetically, which is not correct.
         sorted_index_0 = sub_level_df.index.get_level_values(0).unique()
         sorted_index_1 = sub_level_df.index.get_level_values(1).unique()
+        try:
+            sorted_index_2 = sub_level_df.index.get_level_values(2).unique()
+        except IndexError:
+            sorted_index_2 = None
+
         self.selection_options = sorted_index_1
 
         if self.apply_selection:

@@ -9,14 +9,17 @@ logger = logging.getLogger()
 # de tabel id kan je vinden door naar de data set te gaan op statline en in de url op te zoeken.
 # in dit geval is de url: https://opendata.cbs.nl/#/CBS/nl/dataset/84410NED/table?ts=1568706226304
 # dus we gaan een plaatje maken uit de tabel 84410NED
-table_id = "84674NED"
+table_id = "84675NED"
+question_id = 48
+#table_id = "84410NED"
+#question_id = 47
 
 statline = StatLineTable(table_id=table_id)
 
 statline.show_module_table(max_width=30)
 statline.show_question_table(max_width=30)
 
-df = statline.get_question_df(49)
+df = statline.get_question_df(question_id=question_id)
 
 logger.info(df.head())
 
@@ -35,7 +38,7 @@ statline.apply_selection = True
 logger.info(f"Select {selection}")
 
 # verkrijg de vragen horen bij vraag 47
-question_df = statline.get_question_df(47)
+question_df = statline.get_question_df(question_id=question_id)
 
 # haal de units op die horen bij vraag 47
 units = question_df[statline.units_key].values[0]
