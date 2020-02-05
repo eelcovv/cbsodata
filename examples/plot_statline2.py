@@ -16,10 +16,14 @@ statline = StatLineTable(table_id=table_id)
 statline.show_module_table(max_width=30)
 statline.show_question_table(max_width=30)
 
-statline.modules_to_plot = 48
+df = statline.get_question_df(49)
 
-statline.plot()
-statline.close_plots()
+logger.info(df.head())
+
+#statline.modules_to_plot = 48
+
+# statline.plot()
+# statline.close_plots()
 
 # toon de inhoud van de data nog een keer
 statline.show_selection()
